@@ -25,52 +25,53 @@ refs.timerField.forEach(elem => {
   elem.firstElementChild.style.fontSize = '30px';
 });
 
-
 const options = {
   enableTime: true,
   time_24hr: true,
   minuteIncrement: 1,
   onClose(selectedDates) {
-    refs.startBtn.removeAttribute('disabled', 'disabled');
-    refs.startBtn.addEventListener('click', onRunTimer);
-    
-    function onRunTimer() {
-      Notify.info("Let's go!!!");
-      refs.startBtn.setAttribute('disabled', 'disabled');
-      refs.input.setAttribute('disabled', 'disabled');
-      const timerId = setInterval(() => {
-        const date = new Date();
-        const dateDifference = selectedDates[0].getTime() - date.getTime();
-          if (dateDifference < -999) {
+    let date = new Date();
+    if ((selectedDates[0].getTime() - date.getTime()) <= 0) {
+      Report.failure(
+        'Failure!',
+        'Please choose a date in the future!',
+        'Okay'
+      );
+    } else {
+      
+      refs.startBtn.removeAttribute('disabled', 'disabled');
+      refs.startBtn.addEventListener('click', onRunTimer);
+      function onRunTimer() {
+        Notify.info("Let's go!!!");
+        refs.startBtn.setAttribute('disabled', 'disabled');
+        refs.input.setAttribute('disabled', 'disabled');
+
+        const timerId = setInterval(() => {
+          date = new Date();
+          const dateDifference = selectedDates[0].getTime() - date.getTime();
+            
+          if (dateDifference <= 0) {
             clearInterval(timerId);
-            Report.failure(
-              'Failure!',
-              'Please choose a date in the future!',
-              'Okay'
-            );
             refs.input.removeAttribute('disabled', 'disabled');
+            Report.success(
+              'Success!',
+              'You have reached your goal!',
+              'Good)'
+            );
           } else {
-            if (dateDifference <= 0) {
-              clearInterval(timerId);
-              refs.input.removeAttribute('disabled', 'disabled');
-                Report.success(
-                  'Success!',
-                  'You have reached your goal!',
-                  'Good)'
-                );
-            } else {
-              const timerIndication = convertMs(dateDifference);
-              for (const key in timerIndication) {
-                refs[key].textContent = String(timerIndication[key]).padStart(2, '0');
-              }
-  }
-}
-            }, 1000);
+            const timerIndication = convertMs(dateDifference);
+            for (const key in timerIndication) {
+              refs[key].textContent = String(timerIndication[key]).padStart(2, '0');
+            }
+          }
+        }, 1000);
         
-        }
+      }
         
     }
+  }
 };
+
 
 
 
@@ -79,17 +80,16 @@ refs.input.addEventListener(
   flatpickr(refs.input, options)
 );
 
-function convertMs(ms) {
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
+    function convertMs(ms) {
+      const second = 1000;
+      const minute = second * 60;
+      const hour = minute * 60;
+      const day = hour * 24;
 
-  const days = Math.floor(ms / day);
-  const hours = Math.floor((ms % day) / hour);
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
+      const days = Math.floor(ms / day);
+      const hours = Math.floor((ms % day) / hour);
+      const minutes = Math.floor(((ms % day) % hour) / minute);
+      const seconds = Math.floor((((ms % day) % hour) % minute) / second);
 
-  return { days, hours, minutes, seconds };
-}
-
+      return {days, hours, minutes, seconds};
+    };
