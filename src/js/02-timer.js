@@ -29,16 +29,12 @@ const options = {
   enableTime: true,
   time_24hr: true,
   minuteIncrement: 1,
+  defaultDate: new Date(),
   onClose(selectedDates) {
     let date = new Date();
-    if ((selectedDates[0].getTime() - date.getTime()) <= 0) {
-      Report.failure(
-        'Failure!',
-        'Please choose a date in the future!',
-        'Okay'
-      );
+    if (selectedDates[0].getTime() - date.getTime() <= 0) {
+      Report.failure('Failure!', 'Please choose a date in the future!', 'Okay');
     } else {
-      
       refs.startBtn.removeAttribute('disabled', 'disabled');
       refs.startBtn.addEventListener('click', onRunTimer);
       function onRunTimer() {
@@ -49,27 +45,24 @@ const options = {
         const timerId = setInterval(() => {
           date = new Date();
           const dateDifference = selectedDates[0].getTime() - date.getTime();
-            
+
           if (dateDifference <= 0) {
             clearInterval(timerId);
             refs.input.removeAttribute('disabled', 'disabled');
-            Report.success(
-              'Success!',
-              'You have reached your goal!',
-              'Good)'
-            );
+            Report.success('Success!', 'You have reached your goal!', 'Good)');
           } else {
             const timerIndication = convertMs(dateDifference);
             for (const key in timerIndication) {
-              refs[key].textContent = String(timerIndication[key]).padStart(2, '0');
+              refs[key].textContent = String(timerIndication[key]).padStart(
+                2,
+                '0'
+              );
             }
           }
         }, 1000);
-        
       }
-        
     }
-  }
+  },
 };
 
 
