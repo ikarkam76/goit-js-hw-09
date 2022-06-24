@@ -11,6 +11,8 @@ function onFormSubmit(event) {
     formData[name] = val;
   })
   let delay = Number(formData.delay) - Number(formData.step);
+  event.currentTarget.reset();
+
   for (let i = 1; i <= formData.amount; i += 1){
     delay += Number(formData.step);
     createPromise(i, delay)
@@ -21,7 +23,7 @@ function onFormSubmit(event) {
         Notify.failure(message);
       })
   }
-
+  
 }
 
 function createPromise(position, delay) {
